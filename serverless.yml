@@ -1,0 +1,48 @@
+service: scheduled-telegarm-bot
+
+frameworkVersion: ">=1.2.0 <2.0.0"
+
+provider:
+  name: aws
+  region: ap-east-1
+  runtime: python3.6
+  environment:
+    TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN}
+    TELEGRAM_BOSSKU_TOKEN: ${env:TELEGRAM_BOSSKU_TOKEN}
+    TELEGRAM_BAYMAX_TOKEN: ${env:TELEGRAM_BAYMAX_TOKEN}
+
+functions:
+  send_message:
+    handler: handler.send_message
+    events:
+      # Invoke Lambda function at 23:15 UTC every day
+      - schedule: cron(45 22 * * ? *)
+      - http:
+          path: send-message
+          method: get
+
+  send_custom_message:
+    handler: handler.send_custom_message
+    events:
+      - http:
+          path: send-custom-message
+          method: post
+
+  print_now:
+    handler: handler.print_now
+    events:
+      - http:
+          path: now
+          method: get
+  handle_command:
+    handler: handler.handle_command
+    events:
+      - http:
+          path: handle_command
+          method: post
+  forward_message:
+    handler: handler.forward_message
+    events:
+      - http:
+          path: forward_message
+          method: post
